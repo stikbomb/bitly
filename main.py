@@ -1,12 +1,8 @@
 import os
-import requests
 import argparse
 
+import requests
 import dotenv
-
-dotenv.load_dotenv()
-
-TOKEN = os.getenv('BITLY_TOKEN')
 
 
 class ApiException(Exception):
@@ -19,7 +15,7 @@ class InputException(Exception):
         super().__init__(msg)
 
 
-def shorten_link(token, url):
+def reduce_link(token, url):
     api_url = 'https://api-ssl.bitly.com/v4/bitlinks'
 
     headers = {
@@ -66,7 +62,7 @@ def count_clicks(token, url):
     except KeyError:
         pass
 
-    return 'Количество кликов по данной ссылке: {}'.format(response.json()['total_clicks'])
+    return response.json()['total_clicks']
 
 
 def main():
@@ -79,16 +75,20 @@ def main():
     if r'://bit.ly' in url:
         url = url.replace('https://', '')
         url = url.replace('http://', '')
-        print(count_clicks(TOKEN, url))
+        print('Количество кликов по данной ссылке: {}'.format(count_clicks(TOKEN, url)))
         return
 
     elif url.startswith('bit.ly'):
-        print(count_clicks(TOKEN, url))
+        print('Количество кликов по данной ссылке: {}'.format(count_clicks(TOKEN, url)))
         return
 
     else:
-        print(shorten_link(TOKEN, url))
+        print(reduce_link(TOKEN, url))
 
 
 if __name__ == '__main__':
+
+    dotenv.load_dotenv()
+    TOKEN = os.getenv('BITLY_TOKEN')
+
     main()
